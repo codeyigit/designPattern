@@ -1,0 +1,187 @@
+@startuml Restaurant Management System
+
+' Style and theme
+skinparam classAttributeIconSize 0
+skinparam style strictuml
+skinparam backgroundColor white
+skinparam class {
+    BackgroundColor white
+    ArrowColor #2688d4
+    BorderColor #2688d4
+}
+
+' Stereotypes
+skinparam stereotypeCBackgroundColor white
+skinparam stereotypeCBorderColor #2688d4
+
+' Interfaces
+interface "<<interface>>\nMeal" as Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+interface "<<interface>>\nObserver" as Observer {
+    +update(String orderId, String status): void
+}
+
+interface "<<interface>>\nPricingStrategy" as PricingStrategy {
+    +calculatePrice(double basePrice): double
+}
+
+interface "<<interface>>\nTranslationAdapter" as TranslationAdapter {
+    +translate(String message): String
+}
+
+' Abstract Classes
+abstract "<<abstract>>\nMealFactory" as MealFactory {
+    +{abstract} createMeal(): Meal
+    +orderMeal(): Meal
+}
+
+' Concrete Classes
+class RestaurantFacade {
+    -orderManager: OrderManager
+    -kitchenCoordinator: KitchenCoordinator
+    -notificationSystem: NotificationSystem
+    -pricingManager: PricingManager
+    -translationService: TranslationService
+    +placeOrder(String orderDetails): Order
+    +trackOrder(String orderId): void
+    +completeOrder(String orderId): void
+    +setPricingStrategy(boolean isStudent): void
+    +setStaffAvailability(String staffId, boolean available): void
+    +displayPrices(double basePrice): void
+}
+
+class OrderManager {
+    -orders: Map<String, Order>
+    +createOrder(String orderDetails): Order
+    +getOrder(String orderId): Order
+    +updateOrderStatus(String orderId, String status): void
+}
+
+class Order {
+    -orderId: String
+    -items: List<Meal>
+    -status: String
+    +getOrderId(): String
+    +getStatus(): String
+    +setStatus(String status): void
+}
+
+class KitchenCoordinator {
+    -observers: List<Observer>
+    +attachObserver(Observer observer): void
+    +detachObserver(Observer observer): void
+    +notifyObservers(String orderId, String status): void
+}
+
+enum "<<singleton>>\nStarterFactory" as StarterFactory {
+    INSTANCE
+    -StarterFactory()
+    +getInstance(): StarterFactory
+    +createMeal(): Meal
+}
+
+class MainCourseFactory {
+    +createMeal(): Meal
+}
+
+class DessertFactory {
+    +createMeal(): Meal
+}
+
+class "<<entity>>\nSalad" as Salad implements Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+class "<<entity>>\nSoup" as Soup implements Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+class "<<entity>>\nBurger" as Burger implements Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+class "<<entity>>\nSteak" as Steak implements Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+class "<<entity>>\nIceCream" as IceCream implements Meal {
+    +getName(): String
+    +getPrice(): double
+    +prepare(): void
+}
+
+class "<<observer>>\nKitchenStaff" as KitchenStaff implements Observer {
+    -staffId: String
+    -isAvailable: boolean
+    +update(String orderId, String status): void
+    +setAvailable(boolean available): void
+}
+
+class "<<observer>>\nWaiter" as Waiter implements Observer {
+    -staffId: String
+    -isAvailable: boolean
+    -language: String
+    +update(String orderId, String status): void
+    +setAvailable(boolean available): void
+}
+
+class "<<strategy>>\nRegularPricingStrategy" as RegularPricingStrategy implements PricingStrategy {
+    +calculatePrice(double basePrice): double
+}
+
+class "<<strategy>>\nStudentPricingStrategy" as StudentPricingStrategy implements PricingStrategy {
+    +calculatePrice(double basePrice): double
+}
+
+class "<<adapter>>\nEnglishTranslationAdapter" as EnglishTranslationAdapter implements TranslationAdapter {
+    +translate(String message): String
+}
+
+class "<<adapter>>\nTurkishTranslationAdapter" as TurkishTranslationAdapter implements TranslationAdapter {
+    +translate(String message): String
+}
+
+class "<<adapter>>\nJapaneseTranslationAdapter" as JapaneseTranslationAdapter implements TranslationAdapter {
+    +translate(String message): String
+}
+
+' Relationships with multiplicity
+RestaurantFacade "1" *--> "1" OrderManager : manages >
+RestaurantFacade "1" *--> "1" KitchenCoordinator : coordinates >
+RestaurantFacade "1" o--> "1" PricingStrategy : uses >
+RestaurantFacade "1" o--> "1..*" TranslationAdapter : uses >
+
+OrderManager "1" o--> "0..*" Order : manages >
+Order "1" o--> "1..*" Meal : contains >
+
+KitchenCoordinator "1" o--> "0..*" Observer : notifies >
+
+' Factory inheritance relationships
+MealFactory <|-- StarterFactory : extends
+MealFactory <|-- MainCourseFactory : extends
+MealFactory <|-- DessertFactory : extends
+
+' Factory creation relationships
+StarterFactory ..> Salad : <<creates>>
+StarterFactory ..> Soup : <<creates>>
+MainCourseFactory ..> Burger : <<creates>>
+MainCourseFactory ..> Steak : <<creates>>
+DessertFactory ..> IceCream : <<creates>>
+
+' Note about design patterns
+note "Design Patterns Used:\n* Facade Pattern\n* Factory Method Pattern\n* Observer Pattern\n* Strategy Pattern\n* Adapter Pattern\n* Singleton Pattern" as N1
+N1 .. RestaurantFacade
+
+@enduml 
