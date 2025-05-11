@@ -3,6 +3,7 @@ package com.designpattern.kitchen.observer;
 import com.designpattern.kitchen.translator.Language;
 import com.designpattern.kitchen.translator.TranslationService;
 import com.designpattern.kitchen.pricing.PricingStrategy;
+import com.designpattern.kitchen.pricing.WeekdayPricingStrategy;
 
 /**
  * Observer class for waiters with language support
@@ -16,13 +17,29 @@ public class Waiter implements OrderObserver {
     private PricingStrategy pricingStrategy;
 
     public Waiter(String waiterId, String name, Language preferredLanguage, 
-                 TranslationService translator, PricingStrategy pricingStrategy) {
+                 TranslationService translator) {
         this.waiterId = waiterId;
         this.name = name;
         this.active = true;
         this.preferredLanguage = preferredLanguage;
         this.translator = translator;
-        this.pricingStrategy = pricingStrategy;
+        this.pricingStrategy = new WeekdayPricingStrategy(); // Default strategy
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Language getPreferredLanguage() {
+        return preferredLanguage;
+    }
+
+    public TranslationService getTranslator() {
+        return translator;
+    }
+
+    public PricingStrategy getPricingStrategy() {
+        return pricingStrategy;
     }
 
     @Override
