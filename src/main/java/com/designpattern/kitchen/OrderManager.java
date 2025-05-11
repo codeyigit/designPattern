@@ -14,6 +14,7 @@ import com.designpattern.kitchen.pricing.StudentPricingStrategy;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import com.designpattern.kitchen.observer.CustomerInterface;
 
 /**
  * Subsystem class that manages order breakdown into different courses
@@ -61,6 +62,9 @@ public class OrderManager {
                 order.registerObserver(waiter);
             }
         }
+        
+        // Register a CustomerInterface observer
+        order.registerObserver(new CustomerInterface(orderId));
         
         // Add to active orders
         activeOrders.add(order);
