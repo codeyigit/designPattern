@@ -30,7 +30,7 @@ public class RestaurantManagementSystem {
             System.out.println("Taking order from Table 1...");
             Thread.sleep(1000);
             
-            Order order1 = restaurant.placeOrder("1x Salad, 2x Burger");
+            Order order1 = restaurant.placeOrder(1, "1x Salad, 2x Burger");
             System.out.println("Order placed for Table 1");
             
             // Second customer - Student
@@ -40,7 +40,7 @@ public class RestaurantManagementSystem {
             System.out.println("Taking order from Table 2...");
             Thread.sleep(800);
             
-            Order order2 = restaurant.placeOrder("1x Soup, 1x Steak, 1x Ice Cream");
+            Order order2 = restaurant.placeOrder(2, "1x Soup, 1x Steak, 1x Ice Cream");
             System.out.println("Order placed for Table 2");
             
             // Show initial prices for both orders
@@ -72,7 +72,7 @@ public class RestaurantManagementSystem {
             System.out.println("Taking order from Table 3...");
             Thread.sleep(1000);
             
-            Order order3 = restaurant.placeOrder("2x Soup, 1x Ice Cream");
+            Order order3 = restaurant.placeOrder(3, "2x Soup, 1x Ice Cream");
             System.out.println("Order placed for Table 3");
             
             // Complete remaining orders

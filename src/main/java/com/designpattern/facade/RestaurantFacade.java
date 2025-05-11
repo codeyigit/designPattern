@@ -22,8 +22,8 @@ public class RestaurantFacade {
     /**
      * Places a new order in the system
      */
-    public Order placeOrder(String orderItems) {
-        return orderManager.placeOrder(orderItems);
+    public Order placeOrder(int tableNumber, String orderItems) { 
+        return orderManager.placeOrder(tableNumber, orderItems);
     }
 
     /**

@@ -17,7 +17,7 @@ public class CustomerInterface implements OrderObserver {
     }
     @Override
     public void update(String orderId, String status) {
-        System.out.printf("[Customer %s View] Order %s status: %s%n",
+        System.out.printf("[For Customer %s] Order %s status: %s%n",
                           customerId, orderId, status);
     }
     @Override public String getObserverId() { return customerId; }

@@ -48,7 +48,7 @@ public class OrderManager {
                                    translator, new StudentPricingStrategy()));
     }
 
-    public Order placeOrder(String orderItems) {
+    public Order placeOrder(int tableNumber, String orderItems) {
         List<String> courses = breakDownOrder(orderItems);
         String orderId = "ORD-" + System.currentTimeMillis();
         
@@ -64,7 +64,7 @@ public class OrderManager {
         }
         
         // Register a CustomerInterface observer
-        order.registerObserver(new CustomerInterface(orderId));
+        order.registerObserver(new CustomerInterface("TABLE-" + tableNumber));
         
         // Add to active orders
         activeOrders.add(order);
