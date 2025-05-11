@@ -33,7 +33,7 @@ package "Observer Pattern" as ObserverPattern {
         +getObserverId(): String
         +isActive(): boolean
     }
-    
+
     class Order {
         -orderId: String
         -items: List<String>
@@ -47,8 +47,8 @@ package "Observer Pattern" as ObserverPattern {
         +removeObserver(OrderObserver observer): void
         +notifyObservers(String status): void
     }
-    
-    class Waiter implements OrderObserver {
+
+    class Waiter {
         -waiterId: String
         -name: String
         -active: boolean
@@ -64,17 +64,17 @@ package "Observer Pattern" as ObserverPattern {
         +setPricingStrategy(PricingStrategy strategy): void
         +setActive(boolean active): void
     }
-    
-    class KitchenStaff implements OrderObserver {
+
+    class KitchenStaff {
         -staffId: String
         -name: String
         -active: boolean
         +update(String orderId, String status): void
         +setActive(boolean active): void
     }
-    
-    class CustomerInterface implements OrderObserver {
-        -tableId: String
+
+    class CustomerInterface {
+        -customerId: String
         +update(String orderId, String status): void
     }
 }
@@ -84,14 +84,14 @@ package "Strategy Pattern" as StrategyPattern {
         +calculatePrice(double basePrice): double
         +getDescription(): String
     }
-    
-    class WeekdayPricingStrategy implements PricingStrategy {
+
+    class WeekdayPricingStrategy {
         -WEEKDAY_DISCOUNT: double
         +calculatePrice(double basePrice): double
         +getDescription(): String
     }
-    
-    class StudentPricingStrategy implements PricingStrategy {
+
+    class StudentPricingStrategy {
         -STUDENT_DISCOUNT: double
         +calculatePrice(double basePrice): double
         +getDescription(): String
@@ -99,21 +99,21 @@ package "Strategy Pattern" as StrategyPattern {
 }
 
 package "Factory Method Pattern" as FactoryPattern {
-    abstract MealFactory {
+    abstract class MealFactory {
         +{abstract} createMeal(String type): Meal
     }
-    
-    enum StarterFactory {
-        INSTANCE
+
+    class StarterFactory {
+        -INSTANCE: StarterFactory
         -StarterFactory()
         +getInstance(): StarterFactory
         +createMeal(String type): Meal
     }
-    
+
     class MainCourseFactory {
         +createMeal(String type): Meal
     }
-    
+
     class DessertFactory {
         +createMeal(String type): Meal
     }
@@ -125,8 +125,8 @@ package "Adapter Pattern" as AdapterPattern {
         +translateOrderStatus(String status, Language targetLanguage): String
         +formatPrice(double price, Language targetLanguage): String
     }
-    
-    class RestaurantTranslator implements TranslationService {
+
+    class RestaurantTranslator {
         -statusTranslations: Map<String, Map<Language, String>>
         -localeMap: Map<Language, Locale>
         +translate(String text, Language targetLanguage): String
@@ -172,7 +172,7 @@ enum Language {
 }
 
 ' Meal Classes
-class Salad implements Meal {
+class Salad {
     -name: String
     -price: double
     -description: String
@@ -182,7 +182,7 @@ class Salad implements Meal {
     +prepare(): void
 }
 
-class Soup implements Meal {
+class Soup {
     -name: String
     -price: double
     -description: String
@@ -192,7 +192,7 @@ class Soup implements Meal {
     +prepare(): void
 }
 
-class Burger implements Meal {
+class Burger {
     -name: String
     -price: double
     -description: String
@@ -202,7 +202,7 @@ class Burger implements Meal {
     +prepare(): void
 }
 
-class Steak implements Meal {
+class Steak {
     -name: String
     -price: double
     -description: String
@@ -212,7 +212,7 @@ class Steak implements Meal {
     +prepare(): void
 }
 
-class IceCream implements Meal {
+class IceCream {
     -name: String
     -price: double
     -description: String
@@ -231,29 +231,29 @@ OrderManager --> KitchenStaff : manages
 OrderManager --> Waiter : manages
 
 Order --> OrderObserver : notifies
-Waiter -|> OrderObserver : implements
-KitchenStaff -|> OrderObserver : implements
-CustomerInterface -|> OrderObserver : implements
+Waiter ..|> OrderObserver : implements
+KitchenStaff ..|> OrderObserver : implements
+CustomerInterface ..|> OrderObserver : implements
 
 MealFactory <|-- StarterFactory : extends
 MealFactory <|-- MainCourseFactory : extends
 MealFactory <|-- DessertFactory : extends
 
-StarterFactory --> Salad : creates
-StarterFactory --> Soup : creates
-MainCourseFactory --> Burger : creates
-MainCourseFactory --> Steak : creates
-DessertFactory --> IceCream : creates
+StarterFactory ..> Salad : creates
+StarterFactory ..> Soup : creates
+MainCourseFactory ..> Burger : creates
+MainCourseFactory ..> Steak : creates
+DessertFactory ..> IceCream : creates
 
-Salad -|> Meal : implements
-Soup -|> Meal : implements
-Burger -|> Meal : implements
-Steak -|> Meal : implements
-IceCream -|> Meal : implements
+Salad ..|> Meal : implements
+Soup ..|> Meal : implements
+Burger ..|> Meal : implements
+Steak ..|> Meal : implements
+IceCream ..|> Meal : implements
 
-PricingStrategy <|-- WeekdayPricingStrategy : implements
-PricingStrategy <|-- StudentPricingStrategy : implements
+PricingStrategy <|.. WeekdayPricingStrategy : implements
+PricingStrategy <|.. StudentPricingStrategy : implements
 
-TranslationService <|-- RestaurantTranslator : implements
+TranslationService <|.. RestaurantTranslator : implements
 
-@enduml 
+@enduml
