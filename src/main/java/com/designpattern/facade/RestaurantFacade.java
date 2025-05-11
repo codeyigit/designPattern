@@ -12,11 +12,9 @@ import com.designpattern.kitchen.pricing.StudentPricingStrategy;
  */
 public class RestaurantFacade {
     private final OrderManager orderManager;
-    private PricingStrategy currentPricingStrategy;
 
     public RestaurantFacade() {
         this.orderManager = new OrderManager();
-        this.currentPricingStrategy = new WeekdayPricingStrategy(); // Default strategy
     }
 
     /**
@@ -56,8 +54,9 @@ public class RestaurantFacade {
      * Changes the pricing strategy
      */
     public void setPricingStrategy(boolean isStudent) {
-        this.currentPricingStrategy = isStudent ? 
+        PricingStrategy strategy = isStudent ? 
             new StudentPricingStrategy() : new WeekdayPricingStrategy();
+        orderManager.setPricingStrategy(strategy);
     }
 
     /**

@@ -14,174 +14,246 @@ skinparam class {
 skinparam stereotypeCBackgroundColor white
 skinparam stereotypeCBorderColor #2688d4
 
-' Interfaces
-interface "<<interface>>\nMeal" as Meal {
+' Design Pattern Packages
+package "Facade Pattern" as FacadePattern {
+    class RestaurantFacade {
+        -orderManager: OrderManager
+        +placeOrder(int tableNumber, String orderItems): Order
+        +trackOrder(String orderId): void
+        +completeOrder(String orderId): void
+        +setPricingStrategy(boolean isStudent): void
+        +setStaffAvailability(String staffId, boolean active): void
+        +displayPrices(double basePrice): void
+    }
+}
+
+package "Observer Pattern" as ObserverPattern {
+    interface OrderObserver {
+        +update(String orderId, String status): void
+        +getObserverId(): String
+        +isActive(): boolean
+    }
+    
+    class Order {
+        -orderId: String
+        -items: List<String>
+        -status: String
+        -observers: List<OrderObserver>
+        +getOrderId(): String
+        +getStatus(): String
+        +getItems(): List<String>
+        +setStatus(String status): void
+        +registerObserver(OrderObserver observer): void
+        +removeObserver(OrderObserver observer): void
+        +notifyObservers(String status): void
+    }
+    
+    class Waiter implements OrderObserver {
+        -waiterId: String
+        -name: String
+        -active: boolean
+        -preferredLanguage: Language
+        -translator: TranslationService
+        -pricingStrategy: PricingStrategy
+        +getName(): String
+        +getPreferredLanguage(): Language
+        +getTranslator(): TranslationService
+        +getPricingStrategy(): PricingStrategy
+        +update(String orderId, String status): void
+        +displayPrice(double basePrice): void
+        +setPricingStrategy(PricingStrategy strategy): void
+        +setActive(boolean active): void
+    }
+    
+    class KitchenStaff implements OrderObserver {
+        -staffId: String
+        -name: String
+        -active: boolean
+        +update(String orderId, String status): void
+        +setActive(boolean active): void
+    }
+    
+    class CustomerInterface implements OrderObserver {
+        -tableId: String
+        +update(String orderId, String status): void
+    }
+}
+
+package "Strategy Pattern" as StrategyPattern {
+    interface PricingStrategy {
+        +calculatePrice(double basePrice): double
+        +getDescription(): String
+    }
+    
+    class WeekdayPricingStrategy implements PricingStrategy {
+        -WEEKDAY_DISCOUNT: double
+        +calculatePrice(double basePrice): double
+        +getDescription(): String
+    }
+    
+    class StudentPricingStrategy implements PricingStrategy {
+        -STUDENT_DISCOUNT: double
+        +calculatePrice(double basePrice): double
+        +getDescription(): String
+    }
+}
+
+package "Factory Method Pattern" as FactoryPattern {
+    abstract MealFactory {
+        +{abstract} createMeal(String type): Meal
+    }
+    
+    enum StarterFactory {
+        INSTANCE
+        -StarterFactory()
+        +getInstance(): StarterFactory
+        +createMeal(String type): Meal
+    }
+    
+    class MainCourseFactory {
+        +createMeal(String type): Meal
+    }
+    
+    class DessertFactory {
+        +createMeal(String type): Meal
+    }
+}
+
+package "Adapter Pattern" as AdapterPattern {
+    interface TranslationService {
+        +translate(String text, Language targetLanguage): String
+        +translateOrderStatus(String status, Language targetLanguage): String
+        +formatPrice(double price, Language targetLanguage): String
+    }
+    
+    class RestaurantTranslator implements TranslationService {
+        -statusTranslations: Map<String, Map<Language, String>>
+        -localeMap: Map<Language, Locale>
+        +translate(String text, Language targetLanguage): String
+        +translateOrderStatus(String status, Language targetLanguage): String
+        +formatPrice(double price, Language targetLanguage): String
+    }
+}
+
+' Other Classes
+interface Meal {
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
-}
-
-interface "<<interface>>\nObserver" as Observer {
-    +update(String orderId, String status): void
-}
-
-interface "<<interface>>\nPricingStrategy" as PricingStrategy {
-    +calculatePrice(double basePrice): double
-}
-
-interface "<<interface>>\nTranslationAdapter" as TranslationAdapter {
-    +translate(String message): String
-}
-
-' Abstract Classes
-abstract "<<abstract>>\nMealFactory" as MealFactory {
-    +{abstract} createMeal(): Meal
-    +orderMeal(): Meal
-}
-
-' Concrete Classes
-class RestaurantFacade {
-    -orderManager: OrderManager
-    -kitchenCoordinator: KitchenCoordinator
-    -notificationSystem: NotificationSystem
-    -pricingManager: PricingManager
-    -translationService: TranslationService
-    +placeOrder(String orderDetails): Order
-    +trackOrder(String orderId): void
-    +completeOrder(String orderId): void
-    +setPricingStrategy(boolean isStudent): void
-    +setStaffAvailability(String staffId, boolean available): void
-    +displayPrices(double basePrice): void
 }
 
 class OrderManager {
-    -orders: Map<String, Order>
-    +createOrder(String orderDetails): Order
-    +getOrder(String orderId): Order
-    +updateOrderStatus(String orderId, String status): void
+    -starterFactory: StarterFactory
+    -mainCourseFactory: MainCourseFactory
+    -dessertFactory: DessertFactory
+    -activeOrders: List<Order>
+    -chef: KitchenStaff
+    -waiters: List<Waiter>
+    -translator: RestaurantTranslator
+    -currentPricingStrategy: PricingStrategy
+    -tableAssignments: Map<Integer, Waiter>
+    -orderPrices: Map<String, Double>
+    -orderItems: Map<String, List<String>>
+    +placeOrder(int tableNumber, String orderItems): Order
+    +completeOrder(String orderId): void
+    +findOrder(String orderId): Order
+    +setPricingStrategy(PricingStrategy strategy): void
+    +setStaffActive(String staffId, boolean active): void
+    +displayPrices(double basePrice): void
+    -calculateBasePrice(String orderItems): double
+    -displayOrderPrice(String orderId, double basePrice): void
 }
 
-class Order {
-    -orderId: String
-    -items: List<Meal>
-    -status: String
-    +getOrderId(): String
-    +getStatus(): String
-    +setStatus(String status): void
+enum Language {
+    ENGLISH
+    TURKISH
+    JAPANESE
 }
 
-class KitchenCoordinator {
-    -observers: List<Observer>
-    +attachObserver(Observer observer): void
-    +detachObserver(Observer observer): void
-    +notifyObservers(String orderId, String status): void
-}
-
-enum "<<singleton>>\nStarterFactory" as StarterFactory {
-    INSTANCE
-    -StarterFactory()
-    +getInstance(): StarterFactory
-    +createMeal(): Meal
-}
-
-class MainCourseFactory {
-    +createMeal(): Meal
-}
-
-class DessertFactory {
-    +createMeal(): Meal
-}
-
-class "<<entity>>\nSalad" as Salad implements Meal {
+' Meal Classes
+class Salad implements Meal {
+    -name: String
+    -price: double
+    -description: String
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
 }
 
-class "<<entity>>\nSoup" as Soup implements Meal {
+class Soup implements Meal {
+    -name: String
+    -price: double
+    -description: String
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
 }
 
-class "<<entity>>\nBurger" as Burger implements Meal {
+class Burger implements Meal {
+    -name: String
+    -price: double
+    -description: String
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
 }
 
-class "<<entity>>\nSteak" as Steak implements Meal {
+class Steak implements Meal {
+    -name: String
+    -price: double
+    -description: String
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
 }
 
-class "<<entity>>\nIceCream" as IceCream implements Meal {
+class IceCream implements Meal {
+    -name: String
+    -price: double
+    -description: String
     +getName(): String
     +getPrice(): double
+    +getDescription(): String
     +prepare(): void
 }
 
-class "<<observer>>\nKitchenStaff" as KitchenStaff implements Observer {
-    -staffId: String
-    -isAvailable: boolean
-    +update(String orderId, String status): void
-    +setAvailable(boolean available): void
-}
+' Relationships
+RestaurantFacade --> OrderManager : manages
+OrderManager --> RestaurantTranslator : uses
+OrderManager --> PricingStrategy : uses
+OrderManager --> Order : manages
+OrderManager --> KitchenStaff : manages
+OrderManager --> Waiter : manages
 
-class "<<observer>>\nWaiter" as Waiter implements Observer {
-    -staffId: String
-    -isAvailable: boolean
-    -language: String
-    +update(String orderId, String status): void
-    +setAvailable(boolean available): void
-}
+Order --> OrderObserver : notifies
+Waiter -|> OrderObserver : implements
+KitchenStaff -|> OrderObserver : implements
+CustomerInterface -|> OrderObserver : implements
 
-class "<<strategy>>\nRegularPricingStrategy" as RegularPricingStrategy implements PricingStrategy {
-    +calculatePrice(double basePrice): double
-}
-
-class "<<strategy>>\nStudentPricingStrategy" as StudentPricingStrategy implements PricingStrategy {
-    +calculatePrice(double basePrice): double
-}
-
-class "<<adapter>>\nEnglishTranslationAdapter" as EnglishTranslationAdapter implements TranslationAdapter {
-    +translate(String message): String
-}
-
-class "<<adapter>>\nTurkishTranslationAdapter" as TurkishTranslationAdapter implements TranslationAdapter {
-    +translate(String message): String
-}
-
-class "<<adapter>>\nJapaneseTranslationAdapter" as JapaneseTranslationAdapter implements TranslationAdapter {
-    +translate(String message): String
-}
-
-' Relationships with multiplicity
-RestaurantFacade "1" *--> "1" OrderManager : manages >
-RestaurantFacade "1" *--> "1" KitchenCoordinator : coordinates >
-RestaurantFacade "1" o--> "1" PricingStrategy : uses >
-RestaurantFacade "1" o--> "1..*" TranslationAdapter : uses >
-
-OrderManager "1" o--> "0..*" Order : manages >
-Order "1" o--> "1..*" Meal : contains >
-
-KitchenCoordinator "1" o--> "0..*" Observer : notifies >
-
-' Factory inheritance relationships
 MealFactory <|-- StarterFactory : extends
 MealFactory <|-- MainCourseFactory : extends
 MealFactory <|-- DessertFactory : extends
 
-' Factory creation relationships
-StarterFactory ..> Salad : <<creates>>
-StarterFactory ..> Soup : <<creates>>
-MainCourseFactory ..> Burger : <<creates>>
-MainCourseFactory ..> Steak : <<creates>>
-DessertFactory ..> IceCream : <<creates>>
+StarterFactory --> Salad : creates
+StarterFactory --> Soup : creates
+MainCourseFactory --> Burger : creates
+MainCourseFactory --> Steak : creates
+DessertFactory --> IceCream : creates
 
-' Note about design patterns
-note "Design Patterns Used:\n* Facade Pattern\n* Factory Method Pattern\n* Observer Pattern\n* Strategy Pattern\n* Adapter Pattern\n* Singleton Pattern" as N1
-N1 .. RestaurantFacade
+Salad -|> Meal : implements
+Soup -|> Meal : implements
+Burger -|> Meal : implements
+Steak -|> Meal : implements
+IceCream -|> Meal : implements
+
+PricingStrategy <|-- WeekdayPricingStrategy : implements
+PricingStrategy <|-- StudentPricingStrategy : implements
+
+TranslationService <|-- RestaurantTranslator : implements
 
 @enduml 

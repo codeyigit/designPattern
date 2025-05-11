@@ -43,16 +43,6 @@ public class RestaurantManagementSystem {
             Order order2 = restaurant.placeOrder(2, "1x Soup, 1x Steak, 1x Ice Cream");
             System.out.println("Order placed for Table 2");
             
-            // Show initial prices for both orders
-            System.out.println("\n=== Price Information ===");
-            System.out.println("Table 1 (Regular Customer):");
-            restaurant.setPricingStrategy(false);
-            restaurant.displayPrices(45.99);
-            
-            System.out.println("\nTable 2 (Student):");
-            restaurant.setPricingStrategy(true);
-            restaurant.displayPrices(45.99);
-            
             // Track orders progress
             System.out.println("\n=== Kitchen Progress ===");
             Thread.sleep(1500);
